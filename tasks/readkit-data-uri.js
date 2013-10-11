@@ -1,9 +1,9 @@
 /*
- * grunt-data-uri
- * http://github.com/ahomu/grunt-data-uri
+ * grunt-readkit-data-uri
+ * http://github.com/jcdarwin/grunt-readkit-data-uri
  * http://aho.mu
  *
- * Copyright (c) 2012 ahomu
+ * Copyright (c) 2012 ahomu, jcdarwin
  * Licensed under the MIT license.
  */
 module.exports = function(grunt) {
@@ -14,7 +14,8 @@ module.exports = function(grunt) {
       path    = require('path'),
       datauri = require('datauri');
 
-  var RE_CSS_URLFUNC = /(?:url\(["']?)(.*?)(?:["']?\))/,
+  var RE_CSS_URLFUNC = /(?:url\(["']?)([^"']*)(?:["']?\)?)/,
+      RE_HTML_URLFUNC = /(?:link\s[^<>]*href=["']*)([^"']*)(?:["']?)/,
       util = grunt.util || grunt.utils, // for 0.4.0
       gruntfileDir = path.resolve('./'),
       expandFiles;
@@ -27,7 +28,7 @@ module.exports = function(grunt) {
     };
   }
 
-  grunt.registerMultiTask('dataUri', 'Convert your css file image path!!', function() {
+  grunt.registerMultiTask('readkit_data_uri', 'Convert your css and html file image path!!', function() {
     // @memo this.file(0.3.x), this.files(0.4.0a) -> safe using this.data.src|dest
 
     var options  = this.options ? this.options() : this.data.options, // for 0.4.0
@@ -35,13 +36,20 @@ module.exports = function(grunt) {
         destDir  = path.resolve(this.data.dest),
         haystack = [];
 
+    var RE_URLFUNC = '';
+    if (options.type && options.type === 'html') {
+      RE_URLFUNC = RE_HTML_URLFUNC;
+    }
+    if (options.type && options.type === 'css') {
+      RE_URLFUNC = RE_CSS_URLFUNC;
+    }
     expandFiles(options.target).forEach(function(imgPath) {
       haystack.push(path.resolve(imgPath));
     });
 
     srcFiles.forEach(function(src) {
       var content  = grunt.file.read(src),
-          matches  = content.match(new RegExp(RE_CSS_URLFUNC.source, 'g')),
+          matches  = content.match(new RegExp(RE_URLFUNC.source, 'g')),
           outputTo = destDir+'/'+path.basename(src),
           baseDir,
           uris;
@@ -64,12 +72,12 @@ module.exports = function(grunt) {
 
       // List uniq image URIs
       uris = util._.uniq(matches.map(function(m) {
-        return m.match(RE_CSS_URLFUNC)[1];
+        return m.match(RE_URLFUNC)[1];
       }));
 
       // Exclude external http resource
       uris = uris.filter(function(u) {
-        return !u.match('(data:|http)');
+        return u && !u.match('(data:|http)');
       });
 
       grunt.log.subhead('SRC: '+uris.length+' file uri found on '+src);
@@ -90,18 +98,19 @@ module.exports = function(grunt) {
           replacement = datauri(needle);
 
           grunt.log.ok('Encode: '+needle);
+          content = content.replace(new RegExp(uri, 'g'), replacement);
         } else {
           if (options.fixDirLevel) {
             // Diff of directory level
             replacement = adjustDirectoryLevel(fixedUri, destDir, baseDir);
             grunt.log.ok('Adjust: '+ uri + ' -> ' + replacement);
+            content = content.replace(new RegExp(uri, 'g'), replacement);
           } else {
-            replacement = u;
+            replacement = uri;
             grunt.log.ok('Ignore: '+ uri);
           }
         }
 
-        content = content.replace(new RegExp(uri, 'g'), replacement);
       });
 
       // Revert base to gruntjs executing current dir

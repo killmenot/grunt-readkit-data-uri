@@ -1,4 +1,8 @@
-#grunt-data-uri
+#grunt-readkit-data-uri
+
+> A grunt task to base 64 encode files as data URIs for use with Readk.it.
+
+This plugin is based on the [grunt-readkit-data-uri plugin](https://github.com/ahomu/grunt-readkit-data-uri) by Ayumu Sato.
 
 This is [gruntplugin](http://gruntjs.com) task. Support gruntjs version are 0.3.x and 0.4.0a(devel).
 
@@ -9,13 +13,13 @@ This is [gruntplugin](http://gruntjs.com) task. Support gruntjs version are 0.3.
 Install from npm.
 
 ```
-% npm install grunt-data-uri
+% npm install grunt-readkit-data-uri
 ```
 
 Add your project's `grunt.js` (`Gruntfile.js` when ~0.4.0rc5).
 
 ```javascript
-grunt.loadNpmTasks('grunt-data-uri');
+grunt.loadNpmTasks('grunt-readkit-data-uri');
 ```
 
 ##Example
@@ -37,7 +41,9 @@ grunt.initConfig({
         // adjust relative path?
         fixDirLevel: true,
         // img detecting base dir
-        // baseDir: './'
+        baseDir: './',
+        // Do we want to process "css" files or "html"?
+        type: 'html'
       }
     }
   }
@@ -57,7 +63,7 @@ div { background-image: url('../../img/not_encode.png'); }
 
 ###Execute
 
-Execute grunt-data-uri
+Execute grunt-readkit-data-uri
 
 ```
 % grunt dataUri
