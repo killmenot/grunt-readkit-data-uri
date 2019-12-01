@@ -95,7 +95,7 @@ module.exports = function(grunt) {
         // Assume file existing cause found from haystack
         if (haystack.indexOf(needle) !== -1) {
           // Encoding to Data uri
-          replacement = datauri(needle);
+          replacement = datauri.sync(needle);
 
           grunt.log.ok('Encode: '+needle);
           content = content.replace(new RegExp(uri, 'g'), replacement);

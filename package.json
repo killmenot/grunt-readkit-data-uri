@@ -29,10 +29,10 @@
     "url": "git://github.com/jcdarwin/grunt-readkit-data-uri.git"
   },
   "dependencies": {
-    "datauri": ">= 0.1"
+    "datauri": "^2.0.0"
   },
   "devDependencies": {
-    "grunt": "~0.3.16"
+    "grunt": "~0.4.5"
   },
   "engines": {
     "node": ">=0.8.0"
